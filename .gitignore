@@ -1,0 +1,49 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# Node / frontend, if added later
+node_modules/
+dist/
+
+# Local app data
+data/*.sqlite3
+data/*.sqlite3-*
+data/*.db
+data/*.db-*
+data/import_logs/
+data/imports/
+!data/imports/
+data/imports/*
+!data/imports/assets/
+data/imports/assets/*
+!data/imports/assets/.gitkeep
+!data/imports/assets/trades/
+data/imports/assets/trades/*
+!data/imports/assets/trades/.gitkeep
+data/classification/*.csv
+!data/classification/*.example.csv
+logs/
+
+# Secrets and tokens
+secrets/*
+!secrets/README.md
+*.env
+.env*
+
+# Local config overrides
+config/local*.json
+
+# Generated verification output
+/coverage/
+/test_output.txt
+.ai-bridge/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

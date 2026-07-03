@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MF Blue Local Budget</title>
+  <link rel="icon" type="image/png" href="/assets/mascot/tanuki/png/tanuki_icon_128.png" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="phone-shell">
+    <header class="topbar">
+      <h1 id="appTitle">家計簿</h1>
+      <div id="topActions" class="top-actions">
+        <label class="switch-row">
+          <span>中項目表示</span>
+          <input id="showSubcategories" type="checkbox" />
+          <span class="switch"></span>
+        </label>
+      </div>
+    </header>
+
+    <section id="budgetTabView">
+      <section class="period-mode-row budget-only" aria-label="表示期間の切り替え">
+        <button id="modeMonth" class="mode-button active" type="button">月</button>
+        <button id="modeYear" class="mode-button" type="button">年</button>
+      </section>
+
+      <section class="period-row budget-only">
+        <button id="prevPeriod" class="ghost-button" type="button" aria-label="前へ">‹</button>
+        <button id="periodLabel" class="period-label" type="button">----</button>
+        <button id="nextPeriod" class="ghost-button" type="button" aria-label="次へ">›</button>
+        <button id="latestPeriod" class="text-button latest-button" type="button">最新へ</button>
+      </section>
+
+      <nav class="tabs budget-only" aria-label="収支タブ">
+        <button id="expenseTab" class="tab active" type="button">支出</button>
+        <button id="incomeTab" class="tab" type="button">収入</button>
+      </nav>
+
+      <section class="filter-row budget-only" aria-label="口座フィルター">
+        <div id="accountFilters" class="filter-chip-row"></div>
+      </section>
+
+      <section class="summary-card budget-only">
+        <div class="donut-wrap">
+          <div id="donut" class="donut" aria-label="カテゴリ円グラフ"></div>
+          <div id="donutLegend" class="donut-legend" hidden></div>
+        </div>
+        <dl class="totals">
+          <div><dt>収入</dt><dd id="incomeTotal">¥0</dd></div>
+          <div><dt>支出</dt><dd id="expenseTotal" class="expense">¥0</dd></div>
+          <div><dt>収支</dt><dd id="balanceTotal">¥0</dd></div>
+        </dl>
+      </section>
+
+      <section class="notice budget-only" id="emptyNotice" hidden>
+        <p id="emptyNoticeText">まだ明細がありません。</p>
+        <p>Gmail同期またはPayPay CSV取り込みで明細を追加してください。</p>
+      </section>
+
+      <section class="section-header budget-only">
+        <h2 id="categoryHeader">カテゴリ別支出</h2>
+        <button id="syncButton" class="outline-button" type="button">Gmail同期</button>
+      </section>
+
+      <nav class="category-view-tabs budget-only" aria-label="カテゴリと分析タブ">
+        <button id="viewTabCategory" class="detail-tab active" type="button">カテゴリ</button>
+        <button id="viewTabAnalysis" class="detail-tab" type="button">月次分析</button>
+      </nav>
+
+      <section id="categoryList" class="category-list budget-only"></section>
+
+      <section id="fundMovementHint" class="fund-movement-hint budget-only" hidden>
+        <p class="fund-movement-heading">資金移動の案内</p>
+        <div class="fund-movement-row">
+          <span class="fund-movement-label">振替・チャージ</span>
+          <span id="fundMovementTotal" class="fund-movement-amount">¥0</span>
+          <button id="viewFundMovement" class="text-button" type="button">明細を見る</button>
+        </div>
+      </section>
+
+      <section class="section-header transactions-header budget-only">
+        <h2 id="transactionTitle">明細</h2>
+        <button id="clearFilter" class="text-button" hidden type="button">すべて表示</button>
+      </section>
+
+      <section id="transactions" class="transactions budget-only"></section>
+
+      <section id="analysisPanel" class="analysis-panel budget-only" hidden>
+        <div id="analysisHero" class="analysis-hero"></div>
+        <p id="analysisTarget" class="analysis-target"></p>
+        <div class="analysis-actions">
+          <button id="runAnalysisButton" class="outline-button" type="button">分析する</button>
+          <button id="rerunAnalysisButton" class="text-button" type="button">再分析</button>
+        </div>
+        <p id="analysisStatus" class="analysis-status"></p>
+        <div id="analysisResult" class="analysis-result"></div>
+      </section>
+    </section>
+
+    <section id="assetTabView" class="asset-view" hidden>
+      <section class="period-mode-row asset-mode-row" aria-label="資産表示モード">
+        <button id="assetModeMonth" class="mode-button active" type="button">月次</button>
+        <button id="assetModeYear" class="mode-button" type="button">年次</button>
+      </section>
+
+      <section class="period-row asset-period-row">
+        <button id="assetPrevPeriod" class="ghost-button" type="button" aria-label="前へ">‹</button>
+        <button id="assetPeriodLabel" class="period-label" type="button">----</button>
+        <button id="assetNextPeriod" class="ghost-button" type="button" aria-label="次へ">›</button>
+        <button id="assetLatestPeriod" class="text-button latest-button" type="button">最新へ</button>
+      </section>
+
+      <section id="assetEmptyState" class="asset-empty" hidden></section>
+
+      <section id="assetCards" class="asset-cards asset-data-only"></section>
+
+      <section class="asset-chart-section asset-data-only">
+        <div class="section-header asset-section-header">
+          <h2>月ごとの推移</h2>
+          <button id="assetRefreshPricesButton" class="outline-button" type="button">基準価額更新</button>
+        </div>
+        <p id="assetRefreshStatus" class="asset-refresh-status" hidden></p>
+        <div id="assetMetricTabs" class="asset-metric-tabs">
+          <button class="asset-metric-tab active" data-metric="value" type="button">評価額</button>
+          <button class="asset-metric-tab" data-metric="change" type="button">増減額</button>
+          <button class="asset-metric-tab" data-metric="purchase" type="button">買い増し額</button>
+          <button class="asset-metric-tab" data-metric="operation" type="button">運用分</button>
+        </div>
+        <div id="assetChart" class="asset-chart"></div>
+      </section>
+
+      <section class="asset-summary-section asset-data-only">
+        <div class="section-header asset-section-header">
+          <h2>今月のサマリー</h2>
+        </div>
+        <dl id="assetThisMonthSummary" class="asset-summary-list"></dl>
+      </section>
+
+      <section class="asset-yearly-section asset-data-only">
+        <div class="section-header asset-section-header">
+          <h2 id="assetPerformanceTitle">年別成績（暦年）</h2>
+        </div>
+        <div id="assetYearlyCards" class="asset-yearly-cards"></div>
+      </section>
+
+      <section class="asset-holdings-section asset-data-only">
+        <div class="section-header asset-section-header">
+          <h2>保有商品</h2>
+        </div>
+        <div id="assetHoldings" class="asset-holdings"></div>
+      </section>
+
+      <section class="asset-purchase-section asset-data-only">
+        <button id="openAssetPurchaseDialog" class="primary-button asset-purchase-button" type="button">買い増しを追加</button>
+      </section>
+    </section>
+
+    <nav class="bottom-nav" aria-label="下部ナビゲーション">
+      <button id="navHome" type="button">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-4.8a1 1 0 0 1-1-1v-4.7h-2.4V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="nav-label">ホーム</span>
+      </button>
+      <button id="navTransfer" type="button">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M7 6h11m0 0-3-3m3 3-3 3M17 18H6m0 0 3-3m-3 3 3 3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="nav-label">入出金</span>
+      </button>
+      <button id="navBudget" type="button" class="active">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5zm3.5 2.8h9m-9 3.7h6.2m-6.2 3.7h4.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="nav-label">家計簿</span>
+      </button>
+      <button id="navAssets" type="button">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4.5 5h15a1 1 0 0 1 1 1v2.8a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm0 6.6h15a1 1 0 0 1 1 1V18a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1v-5.4a1 1 0 0 1 1-1Z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m7 16 2-2 2 1 3-3 3 2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="nav-label">資産</span>
+      </button>
+      <button id="navSettings" type="button">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="m12 3 1.1 2.2 2.5.4.7 2.4 2.3 1.1-1.1 2.3 1.1 2.3-2.3 1.1-.7 2.4-2.5.4L12 21l-1.1-2.2-2.5-.4-.7-2.4-2.3-1.1 1.1-2.3-1.1-2.3 2.3-1.1.7-2.4 2.5-.4z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="12" cy="12" r="3.1" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+        </span>
+        <span class="nav-label">設定</span>
+      </button>
+    </nav>
+
+    <button id="scrollTopButton" class="scroll-top-button" type="button" aria-label="上へ戻る">↑</button>
+  </main>
+
+  <dialog id="editDialog" class="edit-dialog">
+    <form method="dialog">
+      <h3 class="dialog-title">カテゴリを編集 <span id="editDialogMascot" class="dialog-title-mascot" aria-hidden="true"></span></h3>
+      <p id="editMerchant" class="dialog-merchant"></p>
+      <label>大項目
+        <select id="editCategory"></select>
+      </label>
+      <label>中項目
+        <div id="subcategoryChips" class="subcategory-chips"></div>
+        <input id="editSubcategory" list="subcategoryList" />
+        <datalist id="subcategoryList"></datalist>
+      </label>
+      <label class="check-row">
+        <input id="learnRule" type="checkbox" checked />
+        同じ店舗を次回から同じカテゴリにする
+      </label>
+      <label class="check-row">
+        <input id="applyPastMerchant" type="checkbox" />
+        過去の同じ店舗にも適用する
+      </label>
+      <div class="dialog-actions">
+        <button value="cancel" class="dialog-cancel" type="button">キャンセル</button>
+        <button id="saveEdit" value="default" class="primary-button" type="submit">保存</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="assetPurchaseDialog" class="edit-dialog">
+    <form method="dialog">
+      <h3 class="dialog-title">買い増しを追加</h3>
+      <label>日付
+        <input id="assetPurchaseDate" type="date" required />
+      </label>
+      <label>商品
+        <select id="assetPurchaseProduct" required></select>
+      </label>
+      <label>口座区分
+        <input id="assetPurchaseAccountType" type="text" readonly />
+      </label>
+      <label>購入金額（円）
+        <input id="assetPurchaseAmount" type="number" min="1" step="1" required />
+      </label>
+      <label>口数（任意）
+        <input id="assetPurchaseQuantity" type="number" step="0.0001" />
+      </label>
+      <label>基準価額（任意）
+        <input id="assetPurchaseUnitPrice" type="number" step="0.0001" />
+      </label>
+      <label>受渡日（任意）
+        <input id="assetPurchaseSettlementDate" type="date" />
+      </label>
+      <label>メモ
+        <input id="assetPurchaseMemo" type="text" maxlength="120" />
+      </label>
+      <div class="dialog-actions">
+        <button value="cancel" class="dialog-cancel" type="button">キャンセル</button>
+        <button id="saveAssetPurchase" value="default" class="primary-button" type="submit">保存</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="/app.js?v=20260518"></script>
+</body>
+</html>

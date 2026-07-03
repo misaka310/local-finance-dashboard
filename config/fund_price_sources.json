@@ -1,0 +1,54 @@
+[
+  {
+    "fund_name": "ｅＭＡＸＩＳ　Ｓｌｉｍ　米国株式（Ｓ＆Ｐ５００）",
+    "provider_name": "三菱ＵＦＪアセットマネジメント",
+    "source_url": "https://developer.am.mufg.jp/fund_information_date/fund_cd/253266/base_date/{base_date}",
+    "source_type": "official_api",
+    "parser_name": "mufg_official_api_json",
+    "fund_cd": "253266",
+    "association_fund_cd": "03311187",
+    "is_active": true
+  },
+  {
+    "fund_name": "ｅＭＡＸＩＳ　Ｓｌｉｍ　米国株式（Ｓ＆Ｐ５００）",
+    "provider_name": "三菱ＵＦＪアセットマネジメント",
+    "source_url": "https://www.am.mufg.jp/fund_file/chart/chart_data_253266.js",
+    "source_type": "official_public_data",
+    "parser_name": "mufg_chart_js",
+    "is_active": true
+  },
+  {
+    "fund_name": "ｅＭＡＸＩＳ　Ｓｌｉｍ　新興国株式インデックス",
+    "provider_name": "三菱ＵＦＪアセットマネジメント",
+    "source_url": "https://developer.am.mufg.jp/fund_information_date/fund_cd/252878/base_date/{base_date}",
+    "source_type": "official_api",
+    "parser_name": "mufg_official_api_json",
+    "fund_cd": "252878",
+    "association_fund_cd": "0331C177",
+    "is_active": true
+  },
+  {
+    "fund_name": "ｅＭＡＸＩＳ　Ｓｌｉｍ　新興国株式インデックス",
+    "provider_name": "三菱ＵＦＪアセットマネジメント",
+    "source_url": "https://www.am.mufg.jp/fund_file/chart/chart_data_252878.js",
+    "source_type": "official_public_data",
+    "parser_name": "mufg_chart_js",
+    "is_active": true
+  },
+  {
+    "fund_name": "ニッセイＳＯＸ指数インデックスファンド（米国半導体株）＜購入・換金手数料なし＞",
+    "provider_name": "ニッセイアセットマネジメント",
+    "source_url": "https://www.nam.co.jp/fundinfo/data/csv.php?fund_code=122309",
+    "source_type": "official_csv",
+    "parser_name": "nam_csv_cp932",
+    "is_active": true
+  },
+  {
+    "fund_name": "ＳＢＩ日本高配当株式（分配）ファンド（年４回決算型）",
+    "provider_name": "SBIアセットマネジメント",
+    "source_url": "https://apl.wealthadvisor.jp/xml/chart/funddata/2023121201.xml",
+    "source_type": "official_public_data",
+    "parser_name": "wealthadvisor_fund_xml",
+    "is_active": true
+  }
+]

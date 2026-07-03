@@ -1,0 +1,10 @@
+﻿merchant_pattern,match_type,category,subcategory
+ローソン,contains,食費,コンビニ
+ファミリーマート,contains,食費,コンビニ
+セブン,contains,食費,コンビニ
+マツモトキヨシ,contains,日用品,ドラッグストア
+ウエルシア,contains,日用品,ドラッグストア
+コナミスポーツ,contains,趣味・娯楽,スポーツ
+ＪＲ,contains,交通費,電車
+Suica,contains,交通費,電子マネー
+Amazon,contains,未分類,未分類

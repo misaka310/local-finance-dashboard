@@ -1,0 +1,41 @@
+{
+  "app": {
+    "name": "mfblue-local-budget",
+    "ui_port": 8765,
+    "database_path": "data/mfblue.sqlite3"
+  },
+  "gmail": {
+    "query": "newer_than:180d (from:(paypay-card.co.jp) OR subject:(PayPayカード) OR \"PayPayカード\")",
+    "max_results": 100,
+    "source_id": "paypay-card",
+    "account_name": "PayPayカード",
+    "timezone": "Asia/Tokyo",
+    "sources": [
+      {
+        "source_id": "paypay-card",
+        "account_name": "PayPayカード",
+        "parser": "paypay-card",
+        "query": "newer_than:180d (from:(paypay-card.co.jp) OR subject:(PayPayカード) OR \"PayPayカード\")",
+        "max_results": 100
+      },
+      {
+        "source_id": "amazon-order",
+        "account_name": "Amazonメール",
+        "parser": "amazon-order",
+        "query": "newer_than:180d from:(amazon.co.jp) ((subject:(注文を確定しました OR ご注文の確認 OR 注文確認 OR ご注文ありがとうございます OR 注文内容の確認 OR 注文済み) OR (\"注文番号\" (\"注文合計\" OR \"ご請求額\" OR \"お支払い金額\"))) -subject:(発送 OR 出荷 OR 配達 OR お届け OR キャンセル OR 返金 OR 返品 OR セール OR おすすめ OR Prime) -(発送しました OR 発送のお知らせ OR 配達完了 OR 返金のお知らせ OR タイムセール OR Prime会員))",
+        "max_results": 100
+      }
+    ]
+  },
+  "privacy": {
+    "store_email_body": false,
+    "store_raw_snippet": false
+  },
+  "analysis": {
+    "enabled": true,
+    "codex_app_server_url": "ws://127.0.0.1:8787",
+    "analyzer": "codex-app-server",
+    "analyzer_version": "v2",
+    "timeout_seconds": 120
+  }
+}
