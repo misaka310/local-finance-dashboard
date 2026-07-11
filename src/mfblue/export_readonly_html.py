@@ -323,11 +323,25 @@ def _readonly_runtime_script() -> str:
     return path.read_text(encoding="utf-8").strip()
 
 
+def _application_styles() -> str:
+    style_paths = [
+        project_path("frontend", "styles", "base.css"),
+        project_path("frontend", "styles", "assets.css"),
+        project_path("frontend", "styles", "components.css"),
+    ]
+    missing = [str(style_path) for style_path in style_paths if not style_path.exists()]
+    if missing:
+        raise FileNotFoundError(f"Application stylesheet not found: {', '.join(missing)}")
+    return "\n\n".join(
+        style_path.read_text(encoding="utf-8").strip() for style_path in style_paths
+    )
+
+
 def _render_html(payload: dict[str, Any]) -> str:
     data_json = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
 
     index_html = project_path("frontend", "index.html").read_text(encoding="utf-8")
-    styles_css = project_path("frontend", "styles.css").read_text(encoding="utf-8")
+    styles_css = _application_styles()
 
     extra_css = """
 .readonly-demo-badge {
@@ -351,12 +365,25 @@ def _render_html(payload: dict[str, Any]) -> str:
         f"<script id=\"mfblue-data\" type=\"application/json\">{data_json}</script>\n"
         f"<script>\n{_readonly_runtime_script()}\n</script>"
     )
-    html = re.sub(
-        r"<script\s+src=\"/app\.js(?:\?[^\"]*)?\"\s*></script>",
-        lambda _: script_block,
+    module_script_pattern = (
+        r"(?:\s*<script\s+src=\"/app-(?:core|assets|budget|analysis|bootstrap)\.js"
+        r"(?:\?[^\"]*)?\"\s*></script>)+"
+    )
+    html, replacement_count = re.subn(
+        module_script_pattern,
+        lambda _: "\n" + script_block,
         html,
         count=1,
     )
+    if replacement_count != 1:
+        html, replacement_count = re.subn(
+            r"<script\s+src=\"/app\.js(?:\?[^\"]*)?\"\s*></script>",
+            lambda _: script_block,
+            html,
+            count=1,
+        )
+    if replacement_count != 1:
+        raise RuntimeError("Application script tags were not found in frontend/index.html")
 
     html = html.replace("<title>MF Blue Local Budget</title>", "<title>家計簿 (読み取り専用デモ)</title>")
     return html

@@ -1,12 +1,17 @@
+from __future__ import annotations
+
 import sys
-from pathlib import Path
 import unittest
+from pathlib import Path
 
-# Add the project root to sys.path so 'src' can be found
-project_root = Path(__file__).resolve().parents[0]
-sys.path.insert(0, str(project_root / "src"))
 
-# Discover and run all tests in the 'tests' directory
-suite = unittest.TestLoader().discover(str(project_root / "tests"))
-runner = unittest.TextTestRunner(verbosity=2)
-runner.run(suite)
+def main() -> int:
+    project_root = Path(__file__).resolve().parent
+    sys.path.insert(0, str(project_root / "src"))
+    suite = unittest.TestLoader().discover(str(project_root / "tests"))
+    result = unittest.TextTestRunner(verbosity=2).run(suite)
+    return 0 if result.wasSuccessful() else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

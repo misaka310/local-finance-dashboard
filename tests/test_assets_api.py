@@ -40,7 +40,7 @@ class AssetsApiTests(unittest.TestCase):
                 finally:
                     inner.close()
 
-            with patch("mfblue.server.db", temp_db_ctx):
+            with patch("mfblue.api_routes.db", temp_db_ctx):
                 server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
                 thread = threading.Thread(target=server.serve_forever, daemon=True)
                 thread.start()
@@ -130,7 +130,7 @@ class AssetsApiTests(unittest.TestCase):
                 finally:
                     inner.close()
 
-            with patch("mfblue.server.db", temp_db_ctx):
+            with patch("mfblue.api_routes.db", temp_db_ctx):
                 server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
                 thread = threading.Thread(target=server.serve_forever, daemon=True)
                 thread.start()
@@ -196,10 +196,10 @@ class AssetsApiTests(unittest.TestCase):
                     inner.close()
 
             with (
-                patch("mfblue.server.db", temp_db_ctx),
-                patch("mfblue.server.fetch_nav_prices", return_value={"sources": 2, "fetched": 3, "inserted": 1, "updated": 1, "skipped": 1, "errors": 0, "error_details": []}),
-                patch("mfblue.server.generate_snapshots", return_value={"months": 1, "inserted": 0, "updated": 1, "skipped": 0, "protected": 1, "errors": 0}),
-                patch("mfblue.server.repair_asset_snapshot_duplicates", return_value={"verified_month": "2026-05", "verified_total": 1234567}),
+                patch("mfblue.api_routes.db", temp_db_ctx),
+                patch("mfblue.api_routes.fetch_nav_prices", return_value={"sources": 2, "fetched": 3, "inserted": 1, "updated": 1, "skipped": 1, "errors": 0, "error_details": []}),
+                patch("mfblue.api_routes.generate_snapshots", return_value={"months": 1, "inserted": 0, "updated": 1, "skipped": 0, "protected": 1, "errors": 0}),
+                patch("mfblue.api_routes.repair_asset_snapshot_duplicates", return_value={"verified_month": "2026-05", "verified_total": 1234567}),
             ):
                 server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
                 thread = threading.Thread(target=server.serve_forever, daemon=True)
