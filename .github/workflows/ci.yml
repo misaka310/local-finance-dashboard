@@ -14,9 +14,43 @@ jobs:
           python-version: "3.11"
       - name: Install Python dependencies
         run: python -m pip install -r requirements.txt
-      - name: Run Python tests
-        run: python run_tests_with_path.py
+      - name: Run Python tests - budget core
+        run: >-
+          python run_tests_with_path.py
+          test_account_groups.py
+          test_analysis_runs.py
+          test_db_account_filters.py
+          test_db_source_uniqueness.py
+          test_parser.py
+      - name: Run Python tests - asset core
+        if: always()
+        run: >-
+          python run_tests_with_path.py
+          test_asset_fund_names.py
+          test_assets_api.py
+          test_assets_db.py
+          test_assets_frontend.py
+          test_fetch_fund_nav_prices.py
+      - name: Run Python tests - asset imports
+        if: always()
+        run: >-
+          python run_tests_with_path.py
+          test_generate_asset_snapshots.py
+          test_import_asset_trades_csv.py
+          test_import_assets_csv.py
+          test_repair_asset_snapshot_duplicates.py
+          test_export_readonly_html.py
+      - name: Run Python tests - source imports
+        if: always()
+        run: >-
+          python run_tests_with_path.py
+          test_import_amazon_history_csv.py
+          test_refactor_structure.py
+          test_sync_gmail_amazon_order_flow.py
+          test_sync_gmail_external_id.py
+          test_sync_sources.py
       - name: Check frontend JavaScript syntax
+        if: always()
         shell: pwsh
         run: |
           $files = @(

@@ -26,10 +26,15 @@ class GitHubActionsTestResult(unittest.TextTestResult):
         self._emit_annotation(test, err, "error")
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     project_root = Path(__file__).resolve().parent
     sys.path.insert(0, str(project_root / "src"))
-    suite = unittest.TestLoader().discover(str(project_root / "tests"))
+    patterns = list(argv if argv is not None else sys.argv[1:]) or ["test*.py"]
+    loader = unittest.TestLoader()
+    suite = unittest.TestSuite(
+        loader.discover(str(project_root / "tests"), pattern=pattern)
+        for pattern in patterns
+    )
     result = unittest.TextTestRunner(verbosity=2, resultclass=GitHubActionsTestResult).run(suite)
     return 0 if result.wasSuccessful() else 1
 
