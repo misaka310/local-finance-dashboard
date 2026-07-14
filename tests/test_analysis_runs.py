@@ -1,7 +1,9 @@
 ﻿from __future__ import annotations
 
+import io
 import tempfile
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
 
 from mfblue import analysis
@@ -279,6 +281,47 @@ class AnalysisRunTests(unittest.TestCase):
             self.assertEqual(failed["status"], "failed")
             self.assertIn("接続", failed.get("error_message") or "")
             self.assertEqual(saved["status"], "failed")
+
+    def test_failed_run_survives_non_utf8_console(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            db_path = Path(temp_dir) / "test.sqlite3"
+            self._seed_db(db_path)
+            analysis.CodexAppServerClient = FakeFailClient
+            config = {
+                "analysis": {
+                    "enabled": True,
+                    "codex_app_server_url": "ws://127.0.0.1:8787",
+                    "analyzer": "codex-app-server",
+                    "analyzer_version": "v1",
+                    "timeout_seconds": 10,
+                }
+            }
+
+            raw_output = io.BytesIO()
+            console = io.TextIOWrapper(raw_output, encoding="cp1252", errors="strict")
+            conn = connect(db_path)
+            try:
+                init_db(conn)
+                with redirect_stdout(console):
+                    failed = run_or_reuse_analysis(
+                        conn,
+                        config=config,
+                        period_type="month",
+                        period="2026-05",
+                        account_id="all",
+                        direction="expense",
+                        force=False,
+                    )
+                conn.commit()
+                console.flush()
+                rendered = raw_output.getvalue().decode("cp1252")
+            finally:
+                conn.close()
+                console.detach()
+
+            self.assertEqual(failed["status"], "failed")
+            self.assertIn("\\u63a5", rendered)
+            self.assertIn("接続", failed.get("error_message") or "")
 
     def test_stale_analysis_is_returned_when_input_hash_changed(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:

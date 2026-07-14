@@ -3,6 +3,7 @@
 import hashlib
 import json
 import re
+import sys
 from collections import defaultdict
 from typing import Any
 
@@ -17,6 +18,16 @@ from .db import (
 
 MONTH_RE = re.compile(r"^20\d{2}-(0[1-9]|1[0-2])$")
 YEAR_RE = re.compile(r"^20\d{2}$")
+
+
+def _console_safe_text(value: Any, stream: Any | None = None) -> str:
+    text = str(value)
+    target = stream if stream is not None else sys.stdout
+    encoding = getattr(target, "encoding", None) or "utf-8"
+    try:
+        return text.encode(encoding, errors="backslashreplace").decode(encoding)
+    except LookupError:
+        return text.encode("ascii", errors="backslashreplace").decode("ascii")
 
 
 class AnalysisError(RuntimeError):
@@ -617,10 +628,11 @@ def run_or_reuse_analysis(
     except CodexAppServerError as exc:
         error_code = getattr(exc, "error_code", "codex_app_server_error")
         error_stage = getattr(exc, "stage", None)
-        print(
+        log_message = (
             "[analysis] Codex App Server error: "
             f"code={error_code} stage={error_stage} message={exc}"
         )
+        print(_console_safe_text(log_message))
         row = save_analysis_run(
             conn,
             period_type=period_type,
