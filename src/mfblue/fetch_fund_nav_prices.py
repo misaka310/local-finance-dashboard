@@ -40,7 +40,7 @@ def decode_bytes(raw: bytes) -> str:
 
 
 def fetch_text(url: str, timeout: float = 30.0) -> str:
-    req = urllib.request.Request(url, headers={"User-Agent": "mfblue-local-budget/1.0"})
+    req = urllib.request.Request(url, headers={"User-Agent": "local-finance-dashboard/1.0"})
     with urllib.request.urlopen(req, timeout=timeout) as res:  # noqa: S310
         raw = res.read()
     return decode_bytes(raw)

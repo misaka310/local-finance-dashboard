@@ -1,11 +1,11 @@
 # デモの撮影手順
 
-デモは実データを使わず、`start_sample_mfblue.cmd` が投入するサンプルデータだけで撮影します。動画本体はリポジトリへ無条件に追加しません。公開する場合はGitHub ReleasesまたはGitHubのアップロード資産に置き、READMEには確認済みのサムネイルと再生リンクだけを追加します。
+デモは実データを使わず、`start_sample_dashboard.cmd` が投入するサンプルデータだけで撮影します。動画本体はリポジトリへ無条件に追加しません。公開する場合はGitHub ReleasesまたはGitHubのアップロード資産に置き、READMEには確認済みのサムネイルと再生リンクだけを追加します。
 
 ## 60〜90秒の構成
 
 1. Gmail・CSV・SQLite・ローカルWeb UIを統合する家計簿であることを紹介する。
-2. `start_sample_mfblue.cmd` でサンプル起動する。
+2. `start_sample_dashboard.cmd` でサンプル起動する。
 3. 月別支出、カテゴリ別集計、明細一覧、資産画面を順に表示する。
 4. Gmailは `gmail.readonly`、データはローカル保存であることを説明する。
 5. Codex App Server分析は任意機能で、停止しても家計簿本体は使えることを説明する。

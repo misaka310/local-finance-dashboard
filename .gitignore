@@ -39,6 +39,7 @@ config/local*.json
 
 # Generated verification output
 /coverage/
+/_site/
 /test_output.txt
 .ai-bridge/
 

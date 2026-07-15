@@ -142,7 +142,7 @@ def run_probe(url: str, timeout: int, skip_turn: bool) -> int:
                 "protocolVersion": "1",
                 "clientInfo": {
                     "name": "mfblue-probe",
-                    "title": "MFBlue Probe",
+                    "title": "Local Finance Dashboard Probe",
                     "version": "v1",
                 },
             },
