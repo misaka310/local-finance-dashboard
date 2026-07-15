@@ -1,4 +1,4 @@
-# Tanuki Mascot Assets for mfblue-local-budget
+# Tanuki Mascot Assets for Local Finance Dashboard
 
 このZIPは、家計簿フロントに入れるための「たぬき風マスコット」案の切り出し素材です。
 

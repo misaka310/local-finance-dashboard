@@ -51,7 +51,7 @@ class CodexAppServerClient:
         self,
         url: str,
         timeout_seconds: int = 120,
-        client_name: str = "mfblue-local-budget",
+        client_name: str = "local-finance-dashboard",
         client_version: str = "v1",
     ) -> None:
         self.url = url
@@ -175,7 +175,7 @@ class CodexAppServerClient:
                 "protocolVersion": "1",
                 "clientInfo": {
                     "name": self.client_name,
-                    "title": "MF Blue Local Budget",
+                    "title": "Local Finance Dashboard",
                     "version": self.client_version,
                 },
             },

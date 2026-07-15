@@ -602,7 +602,7 @@ def run_or_reuse_analysis(
     client = CodexAppServerClient(
         url=server_url,
         timeout_seconds=timeout_seconds,
-        client_name="mfblue-local-budget",
+        client_name="local-finance-dashboard",
         client_version=analyzer_version,
     )
     try:

@@ -8,7 +8,7 @@ from .paths import project_path
 
 DEFAULT_CONFIG: dict[str, Any] = {
     "app": {
-        "name": "mfblue-local-budget",
+        "name": "local-finance-dashboard",
         "ui_port": 8765,
         "database_path": "data/mfblue.sqlite3",
     },

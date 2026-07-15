@@ -18,7 +18,7 @@ FRONTEND_DIR = project_path("frontend")
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "mfblue-local-budget/0.1"
+    server_version = "local-finance-dashboard/0.1"
 
     def log_message(self, fmt: str, *args):  # type: ignore[override]
         print("[server] " + fmt % args)

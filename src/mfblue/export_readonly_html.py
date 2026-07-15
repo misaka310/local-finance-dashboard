@@ -385,13 +385,13 @@ def _render_html(payload: dict[str, Any]) -> str:
     if replacement_count != 1:
         raise RuntimeError("Application script tags were not found in frontend/index.html")
 
-    html = html.replace("<title>MF Blue Local Budget</title>", "<title>家計簿 (読み取り専用デモ)</title>")
+    html = html.replace("<title>Local Finance Dashboard</title>", "<title>Local Finance Dashboard (読み取り専用)</title>")
     return html
 
 
 def _build_zip_readme_text() -> str:
     lines = [
-        "MF Blue 読み取り専用デモHTMLエクスポート",
+        "Local Finance Dashboard 読み取り専用HTMLエクスポート",
         "",
         "- このファイルは読み取り専用デモです。",
         "- 編集・同期・再分析は実行されません。",

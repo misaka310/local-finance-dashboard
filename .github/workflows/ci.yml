@@ -34,3 +34,14 @@ jobs:
               exit $LASTEXITCODE
             }
           }
+      - name: Build synthetic public demo
+        run: python scripts/build_public_demo.py --output _site/index.html
+      - name: Verify public demo artifact
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "_site/index.html")) {
+            throw "_site/index.html was not generated"
+          }
+          if (-not (Select-String -Path "_site/index.html" -Pattern "合成データの公開デモ" -Quiet)) {
+            throw "Synthetic-data marker was not found"
+          }
