@@ -11,10 +11,9 @@ from .api_routes import handle_get, handle_patch, handle_post
 from .config import load_config
 from .db import db, init_db
 from .paths import project_path
+from .static_paths import resolve_static_path
 
 FRONTEND_DIR = project_path("frontend")
-
-
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -63,14 +62,10 @@ class Handler(BaseHTTPRequestHandler):
         handle_patch(self)
 
     def serve_static(self, path: str) -> None:
-        if path in ("", "/"):
-            file_path = FRONTEND_DIR / "index.html"
-        else:
-            clean = path.lstrip("/")
-            file_path = (FRONTEND_DIR / clean).resolve()
-            if not str(file_path).startswith(str(FRONTEND_DIR.resolve())):
-                self.send_error(HTTPStatus.FORBIDDEN)
-                return
+        file_path = resolve_static_path(path, FRONTEND_DIR)
+        if file_path is None:
+            self.send_error(HTTPStatus.FORBIDDEN)
+            return
         if not file_path.exists() or not file_path.is_file():
             self.send_error(HTTPStatus.NOT_FOUND)
             return
