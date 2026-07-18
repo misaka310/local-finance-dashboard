@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from mfblue.server import resolve_static_path
+from mfblue.static_paths import resolve_static_path
 
 
 class StaticPathResolutionTests(unittest.TestCase):
