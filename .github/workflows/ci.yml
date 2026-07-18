@@ -18,11 +18,12 @@ jobs:
         run: python -m ruff check src tests scripts run_tests_with_path.py
       - name: Typecheck static path boundary
         run: python -m mypy src/mfblue/static_paths.py
-      - name: Run Python tests with coverage
+      - name: Run Python tests
         run: |
           python -m coverage erase
           python -m coverage run run_tests_with_path.py
-          python -m coverage report
+      - name: Enforce coverage floor
+        run: python -m coverage report
       - name: Check frontend JavaScript syntax
         shell: pwsh
         run: |
