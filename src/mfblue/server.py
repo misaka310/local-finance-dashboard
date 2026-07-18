@@ -6,26 +6,14 @@ import mimetypes
 import webbrowser
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from pathlib import Path
 
 from .api_routes import handle_get, handle_patch, handle_post
 from .config import load_config
 from .db import db, init_db
 from .paths import project_path
+from .static_paths import resolve_static_path
 
 FRONTEND_DIR = project_path("frontend")
-
-
-def resolve_static_path(request_path: str, frontend_dir: Path = FRONTEND_DIR) -> Path | None:
-    """Resolve a requested static path without allowing escape from the frontend root."""
-    root = frontend_dir.resolve()
-    clean = "index.html" if request_path in ("", "/") else request_path.lstrip("/")
-    candidate = (root / clean).resolve()
-    try:
-        candidate.relative_to(root)
-    except ValueError:
-        return None
-    return candidate
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -74,7 +62,7 @@ class Handler(BaseHTTPRequestHandler):
         handle_patch(self)
 
     def serve_static(self, path: str) -> None:
-        file_path = resolve_static_path(path)
+        file_path = resolve_static_path(path, FRONTEND_DIR)
         if file_path is None:
             self.send_error(HTTPStatus.FORBIDDEN)
             return
