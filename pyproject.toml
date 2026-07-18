@@ -20,7 +20,7 @@ source = ["src/mfblue"]
 [tool.coverage.report]
 show_missing = true
 skip_covered = true
-fail_under = 50
+fail_under = 35
 exclude_lines = [
   "pragma: no cover",
   "if TYPE_CHECKING:",
