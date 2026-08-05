@@ -61,17 +61,7 @@ start_sample_dashboard.cmd
 
 ## データフロー
 
-```mermaid
-flowchart LR
-  A[Gmail / 支出CSV] --> B[検証・正規化]
-  C[資産CSV / 取引履歴 / 基準価額] --> D[検証・正規化]
-  B --> E[SQLite]
-  D --> E
-  E --> F[ローカルHTTP API]
-  F --> G[Web UI / 読み取り専用HTML]
-```
-
-詳細は[アーキテクチャ](docs/ARCHITECTURE.md)と[データライフサイクル](docs/DATA_LIFECYCLE.md)にあります。
+冒頭の概要図に、入力データの検証・正規化・重複排除からSQLite、ローカルAPI、Web UIへ至る流れをまとめています。実装詳細は[アーキテクチャ](docs/ARCHITECTURE.md)と[データライフサイクル](docs/DATA_LIFECYCLE.md)を参照してください。
 
 ## プライバシーと安全性
 
