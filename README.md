@@ -9,6 +9,12 @@ Gmail通知とCSVから支出・資産データを取り込み、ローカルSQL
 
 ![合成データで起動したダッシュボード](docs/images/demo.png)
 
+<p align="center">
+  <img src="docs/images/system-overview.png" alt="Local Finance Dashboardのデータ処理フロー概要" width="100%">
+</p>
+
+家計・資産データを検証、正規化、重複排除してローカルダッシュボードへ表示する流れを示しています。
+
 ## 主な機能
 
 - Gmail通知とCSVから支出明細を取り込み、`source_id + external_id`で重複を防止
