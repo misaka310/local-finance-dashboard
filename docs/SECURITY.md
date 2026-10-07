@@ -32,6 +32,15 @@ WindowsではWindows資格情報マネージャー相当の保存先が使われ
 Gmail APIスコープは読み取り専用の `gmail.readonly` に固定します。
 メール送信、ラベル変更、削除などはしません。
 
+## ローカルHTTP境界
+
+- UIサーバーは `127.0.0.1` または `localhost` だけにbindできます。`0.0.0.0`、LAN IP、外部IPは起動時に拒否します。
+- 全HTTPリクエストで `Host` を検証し、起動中のローカルポートを指す `127.0.0.1` / `localhost` 以外は拒否します。
+- `POST` / `PATCH` は `Content-Type: application/json` のみ受け付けます。
+- ブラウザが `Origin` を送る `POST` / `PATCH` は、起動中の同一ローカルoriginだけを受け付けます。不正なoriginは副作用処理の前に拒否します。
+- PowerShellなど同一PC上のネイティブクライアントは `Origin` を省略できます。
+- LAN公開、ポートフォワード、リバースプロキシ、トンネル経由の公開はサポートしません。
+
 ## やらないこと
 
 - PayPayカードサイトへログインしない
@@ -45,4 +54,4 @@ Gmail APIスコープは読み取り専用の `gmail.readonly` に固定しま�
 - `.gitignore` で `data/` と `secrets/` の実ファイルを除外
 - `AGENTS.md` でエージェント用の禁止事項を固定
 - DBにはメール本文全文を保存しない
-- UIは `127.0.0.1` でだけ起動
+- UIはループバックでだけ起動し、HTTP側でも `Host` / `Origin` / `Content-Type` を検証する
