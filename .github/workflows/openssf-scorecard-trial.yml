@@ -1,4 +1,4 @@
-name: OpenSSF Scorecard trial
+name: OpenSSF Scorecard batch trial
 
 on:
   push:
@@ -6,33 +6,82 @@ on:
       - '.github/workflows/openssf-scorecard-trial.yml'
   workflow_dispatch:
 
-permissions: read-all
+permissions:
+  contents: read
 
 jobs:
-  analysis:
-    name: Scorecard analysis
+  scan:
+    name: Scan public repositories
     runs-on: ubuntu-latest
-    permissions:
-      security-events: write
-      id-token: write
     steps:
-      - name: Checkout code
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - name: Run analysis
-        uses: ossf/scorecard-action@2d1146689b8cda280b9bc96326124645441f03bc # v2.4.4
-        with:
-          results_file: results.sarif
-          results_format: sarif
-          publish_results: true
-      - name: Upload artifact
+      - name: Scan all public repositories with Scorecard CLI
+        shell: bash
+        env:
+          GITHUB_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -u
+          mkdir -p scorecard-results
+          : > scorecard-results/failures.txt
+          repos=(
+            github.com/misaka310/local-finance-dashboard
+            github.com/misaka310/repo-launch-doctor
+            github.com/misaka310/ios-sidestore-sample
+            github.com/misaka310/chatgpt_chat_view
+            github.com/misaka310/youtube-dictation-pause-control
+            github.com/misaka310/mouse-battery-tray
+            github.com/misaka310/fe-study
+            github.com/misaka310/local-voice-bridge
+            github.com/misaka310/ios-sidestore-deploy
+            github.com/misaka310/video-highlights-site
+            github.com/misaka310/aws-saa-c03-study
+            github.com/misaka310/local-tts-service
+            github.com/misaka310/task-picker
+            github.com/misaka310/shareclip
+          )
+          for repo in "${repos[@]}"; do
+            name="${repo##*/}"
+            echo "::group::$repo"
+            if docker run --rm -e GITHUB_AUTH_TOKEN ghcr.io/ossf/scorecard:v5.5.0 \
+              --repo="$repo" --format=json > "scorecard-results/${name}.json"; then
+              echo "ok: $repo"
+            else
+              echo "$repo" >> scorecard-results/failures.txt
+              echo "failed: $repo"
+            fi
+            echo "::endgroup::"
+          done
+
+      - name: Build compact summary
+        shell: bash
+        run: |
+          python - <<'PY'
+          import csv, json, pathlib
+          root = pathlib.Path('scorecard-results')
+          rows = []
+          for path in sorted(root.glob('*.json')):
+              try:
+                  data = json.loads(path.read_text(encoding='utf-8'))
+              except Exception:
+                  continue
+              checks = data.get('checks') or []
+              lows = sorted(
+                  ((c.get('score', -1), c.get('name', '')) for c in checks if isinstance(c.get('score'), (int, float))),
+                  key=lambda x: (x[0], x[1])
+              )
+              rows.append({
+                  'repository': path.stem,
+                  'score': data.get('score', ''),
+                  'lowest_checks': '; '.join(f'{name}={score}' for score, name in lows[:6]),
+              })
+          with (root / 'summary.csv').open('w', newline='', encoding='utf-8') as f:
+              w = csv.DictWriter(f, fieldnames=['repository', 'score', 'lowest_checks'])
+              w.writeheader(); w.writerows(rows)
+          print(json.dumps(rows, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Upload Scorecard results
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: openssf-scorecard-results
-          path: results.sarif
+          name: openssf-scorecard-batch-results
+          path: scorecard-results
           retention-days: 5
-      - name: Upload to code-scanning
-        uses: github/codeql-action/upload-sarif@f205ea1c3313d32999d8d6a48b4f6530d4437b38 # v4.37.4
-        with:
-          sarif_file: results.sarif
