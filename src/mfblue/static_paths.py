@@ -1,23 +1,42 @@
 from __future__ import annotations
 
+import posixpath
 from pathlib import Path
 
 
-def resolve_static_path(request_path: str, frontend_dir: Path) -> Path | None:
-    """Resolve a frontend asset while enforcing path-component containment.
-
-    String-prefix checks are insufficient because a sibling such as
-    ``frontend_backup`` starts with ``frontend``. Resolving both paths and using
-    ``relative_to`` makes the directory boundary explicit on Windows and POSIX.
-    The caller remains responsible for checking that the returned path exists.
-    """
+def _static_path_index(frontend_dir: Path) -> dict[str, Path]:
+    """Build a URL-path index from trusted files already inside the frontend tree."""
     root = frontend_dir.resolve()
-    clean = "index.html" if request_path in ("", "/") else request_path.lstrip("/")
-    candidate = (root / clean).resolve()
+    index: dict[str, Path] = {}
+    if not root.is_dir():
+        return index
 
-    try:
-        candidate.relative_to(root)
-    except ValueError:
+    for candidate in root.rglob("*"):
+        if not candidate.is_file():
+            continue
+        resolved = candidate.resolve()
+        try:
+            relative = resolved.relative_to(root).as_posix()
+        except ValueError:
+            continue
+        index[f"/{relative}"] = resolved
+
+    index["/"] = index.get("/index.html", root / "index.html")
+    return index
+
+
+def resolve_static_path(request_path: str, frontend_dir: Path) -> Path | None:
+    """Resolve a frontend asset without constructing filesystem paths from input.
+
+    Request input is normalized only as a POSIX URL path and then used as a key
+    into an index built exclusively from files discovered under ``frontend_dir``.
+    The request therefore never becomes part of a filesystem path expression.
+    """
+    raw = str(request_path or "/")
+    if "\\" in raw or "\x00" in raw:
         return None
 
-    return candidate
+    normalized = posixpath.normpath("/" + raw.lstrip("/"))
+    if raw.endswith("/") and normalized != "/":
+        normalized += "/"
+    return _static_path_index(frontend_dir).get(normalized)

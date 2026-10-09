@@ -109,7 +109,7 @@
     if (!asset) {
       return "";
     }
-    return `<img src="${asset.webp}" data-fallback="${asset.png}" alt="${escapeHtml(altText)}" class="${className}" loading="lazy" decoding="async" />`;
+    return `<img src="${escapeHtml(asset.webp)}" data-fallback="${escapeHtml(asset.png)}" alt="${escapeHtml(altText)}" class="${escapeHtml(className)}" loading="lazy" decoding="async" />`;
   }
 
   function bindMascotFallback(root) {
@@ -1234,7 +1234,7 @@
     const operation = summary.operation_change_yen;
     const isYear = state.asset.viewMode === "year";
     const periodCaption = isYear
-      ? (summary.is_ytd ? `${summary.year}年（年初〜最新月）` : `${summary.year}年`)
+      ? (summary.is_ytd ? `${escapeHtml(summary.year)}年（年初〜最新月）` : `${escapeHtml(summary.year)}年`)
       : `評価日 ${escapeHtml(summary.valuation_date || "--")}`;
 
     el.innerHTML = `
@@ -1483,7 +1483,7 @@
       return;
     }
     select.innerHTML = products.map((row) => `
-      <option value="${row.id}" data-account="${escapeHtml(row.account_type || "")}">
+      <option value="${escapeHtml(row.id)}" data-account="${escapeHtml(row.account_type || "")}">
         ${escapeHtml(row.name)} (${escapeHtml(row.account_type || "未分類")})
       </option>
     `).join("");
