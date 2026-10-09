@@ -40,6 +40,17 @@ class StaticPathResolutionTests(unittest.TestCase):
 
             self.assertEqual(resolve_static_path("/assets/../assets/app.js", frontend), asset.resolve())
 
+    def test_returns_none_for_missing_frontend_root(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            frontend = Path(temp_dir) / "missing"
+            self.assertIsNone(resolve_static_path("/index.html", frontend))
+
+    def test_rejects_nul_in_request_path(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            frontend = Path(temp_dir) / "frontend"
+            frontend.mkdir()
+            self.assertIsNone(resolve_static_path("/index.html\x00.css", frontend))
+
 
 if __name__ == "__main__":
     unittest.main()

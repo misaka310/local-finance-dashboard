@@ -112,6 +112,28 @@
     return `<img src="${asset.webp}" data-fallback="${asset.png}" alt="${escapeHtml(altText)}" class="${className}" loading="lazy" decoding="async" />`;
   }
 
+  function createMascotImage(assetName, altText, className = "") {
+    const asset = (payload.mascots || {})[assetName];
+    if (!asset) {
+      return null;
+    }
+    const img = document.createElement("img");
+    img.src = asset.webp;
+    img.dataset.fallback = asset.png;
+    img.alt = altText;
+    img.className = className;
+    img.loading = "lazy";
+    img.decoding = "async";
+    return img;
+  }
+
+  function makeElement(tagName, className = "", text = "") {
+    const node = document.createElement(tagName);
+    if (className) node.className = className;
+    if (text) node.textContent = text;
+    return node;
+  }
+
   function bindMascotFallback(root) {
     const scope = root || document;
     scope.querySelectorAll("img[data-fallback]").forEach((img) => {
@@ -708,7 +730,8 @@
     state.editing = tx;
     const mascot = $("editDialogMascot");
     if (mascot) {
-      mascot.innerHTML = mascotImageHtml("icon", "たぬきアイコン", "analysis-mascot analysis-mascot-dialog");
+      const image = createMascotImage("icon", "たぬきアイコン", "analysis-mascot analysis-mascot-dialog");
+      mascot.replaceChildren(...(image ? [image] : []));
       bindMascotFallback(mascot);
     }
     $("editMerchant").textContent = `${tx.merchant} / ${fmt.format(tx.amount_yen)}`;
@@ -845,15 +868,15 @@
       ? "今月の家計、ちょっと見てあげるね。"
       : "今年の家計、流れを見ていこう。";
 
-    $("analysisHero").innerHTML = `
-      <div class="analysis-character">
-        ${mascotImageHtml("cheer", "たぬきマスコット", "analysis-mascot analysis-mascot-header")}
-        <div class="analysis-character-copy">
-          <p class="analysis-character-line">${heroIntro}</p>
-          <p class="analysis-character-sub">数字だけじゃなく、見るべきところをしぼって出すよ。</p>
-        </div>
-      </div>
-    `;
+    const hero = $("analysisHero");
+    const character = makeElement("div", "analysis-character");
+    const image = createMascotImage("cheer", "たぬきマスコット", "analysis-mascot analysis-mascot-header");
+    if (image) character.appendChild(image);
+    const copy = makeElement("div", "analysis-character-copy");
+    copy.appendChild(makeElement("p", "analysis-character-line", heroIntro));
+    copy.appendChild(makeElement("p", "analysis-character-sub", "数字だけじゃなく、見るべきところをしぼって出すよ。"));
+    character.appendChild(copy);
+    hero.replaceChildren(character);
     $("analysisTarget").textContent = `対象: ${periodLabel} / ${account} / ${directionLabel}`;
     $("runAnalysisButton").textContent = context.periodType === "month" ? "分析する" : "年間分析する";
     $("rerunAnalysisButton").textContent = "再分析";
@@ -893,27 +916,45 @@
     return [{ title: "コメント", lines: normalized.split("\n").map((line) => line.trim()).filter(Boolean) }];
   }
 
-  function renderAnalysisSectionBody(lines) {
+  function appendAnalysisSectionBody(parent, lines) {
     const clean = lines.map((line) => line.trim()).filter(Boolean);
     if (!clean.length) {
-      return '<p class="analysis-line">（コメントなし）</p>';
+      parent.appendChild(makeElement("p", "analysis-line", "（コメントなし）"));
+      return;
     }
     const bulletLines = clean.filter((line) => /^[-・●]\s*/.test(line));
     if (bulletLines.length >= Math.min(2, clean.length)) {
-      const items = clean
+      const list = makeElement("ul", "analysis-list");
+      clean
         .map((line) => line.replace(/^[-・●]\s*/, "").trim())
         .filter(Boolean)
-        .map((line) => `<li>${escapeHtml(line)}</li>`)
-        .join("");
-      return `<ul class="analysis-list">${items}</ul>`;
+        .forEach((line) => list.appendChild(makeElement("li", "", line)));
+      parent.appendChild(list);
+      return;
     }
-    return clean.map((line) => `<p class="analysis-line">${escapeHtml(line)}</p>`).join("");
+    clean.forEach((line) => parent.appendChild(makeElement("p", "analysis-line", line)));
   }
 
   function renderAnalysisResultCard(text, stale = false) {
     const sections = parseAnalysisSections(text);
-    const cards = sections.map((section, idx) => {
-      const body = renderAnalysisSectionBody(section.lines);
+    const result = $("analysisResult");
+    const character = makeElement("div", "analysis-character");
+    const mascot = createMascotImage("cheer", "分析コメントのたぬき", "analysis-mascot");
+    if (mascot) character.appendChild(mascot);
+    const copy = makeElement("div", "analysis-character-copy");
+    copy.appendChild(makeElement("p", "analysis-character-line", "見どころだけ、ぎゅっとまとめたよ。"));
+    character.appendChild(copy);
+
+    const nodes = [character];
+    if (stale) {
+      const staleNote = makeElement("section", "analysis-stale-note");
+      const staleMascot = createMascotImage("stale", "前回分析のお知らせ", "analysis-mascot analysis-mascot-stale");
+      if (staleMascot) staleNote.appendChild(staleMascot);
+      staleNote.appendChild(makeElement("p", "", "前回の分析を表示中。分類や明細が変わってるから、必要なら再分析してね。"));
+      nodes.push(staleNote);
+    }
+
+    sections.forEach((section, idx) => {
       const classNames = ["analysis-section"];
       if (idx === 0 || section.title === "今月の結論") {
         classNames.push("hero");
@@ -924,33 +965,14 @@
       if (section.title === "次にやること") {
         classNames.push("next-action");
       }
-      return `
-        <section class="${classNames.join(" ")}">
-          <h4>${escapeHtml(section.title)}</h4>
-          ${body}
-        </section>
-      `;
-    }).join("");
-    const staleBadge = stale
-      ? `
-        <section class="analysis-stale-note">
-          ${mascotImageHtml("stale", "前回分析のお知らせ", "analysis-mascot analysis-mascot-stale")}
-          <p>前回の分析を表示中。分類や明細が変わってるから、必要なら再分析してね。</p>
-        </section>
-      `
-      : "";
+      const card = makeElement("section", classNames.join(" "));
+      card.appendChild(makeElement("h4", "", section.title));
+      appendAnalysisSectionBody(card, section.lines);
+      nodes.push(card);
+    });
 
-    $("analysisResult").innerHTML = `
-      <div class="analysis-character">
-        ${mascotImageHtml("cheer", "分析コメントのたぬき", "analysis-mascot")}
-        <div class="analysis-character-copy">
-          <p class="analysis-character-line">見どころだけ、ぎゅっとまとめたよ。</p>
-        </div>
-      </div>
-      ${staleBadge}
-      ${cards}
-    `;
-    bindMascotFallback($("analysisResult"));
+    result.replaceChildren(...nodes);
+    bindMascotFallback(result);
   }
 
   function showAnalysisData(context, data) {
@@ -964,15 +986,14 @@
       renderAnalysisResultCard(data.result_text || "分析結果テキストがありません。", Boolean(data.stale));
     } else {
       $("analysisStatus").textContent = "まだ分析されていません。";
-      $("analysisResult").innerHTML = `
-        <section class="analysis-empty">
-          ${mascotImageHtml("thinking", "分析待ちのたぬき", "analysis-mascot analysis-mascot-empty")}
-          <div>
-            <p class="analysis-character-line">まだ分析してないよ。</p>
-            <p class="analysis-empty-sub">PC版ならこの条件で分析できるよ。</p>
-          </div>
-        </section>
-      `;
+      const empty = makeElement("section", "analysis-empty");
+      const image = createMascotImage("thinking", "分析待ちのたぬき", "analysis-mascot analysis-mascot-empty");
+      if (image) empty.appendChild(image);
+      const copy = document.createElement("div");
+      copy.appendChild(makeElement("p", "analysis-character-line", "まだ分析してないよ。"));
+      copy.appendChild(makeElement("p", "analysis-empty-sub", "PC版ならこの条件で分析できるよ。"));
+      empty.appendChild(copy);
+      $("analysisResult").replaceChildren(empty);
       bindMascotFallback($("analysisResult"));
     }
     $("runAnalysisButton").disabled = false;
@@ -1210,15 +1231,15 @@
     if (!empty) {
       return;
     }
-    empty.innerHTML = `
-      <div class="asset-empty-card">
-        <div class="asset-empty-copy">
-          <p class="asset-empty-title">資産データを取り込むと表示されます</p>
-          <p class="asset-empty-text">資産データがまだありません。SBI証券の保有資産CSVを取り込むと表示されます。</p>
-        </div>
-        <div class="asset-empty-image">${mascotImageHtml("thinking", "たぬきマスコット", "asset-empty-mascot")}</div>
-      </div>
-    `;
+    const card = makeElement("div", "asset-empty-card");
+    const copy = makeElement("div", "asset-empty-copy");
+    copy.appendChild(makeElement("p", "asset-empty-title", "資産データを取り込むと表示されます"));
+    copy.appendChild(makeElement("p", "asset-empty-text", "資産データがまだありません。SBI証券の保有資産CSVを取り込むと表示されます。"));
+    const imageWrap = makeElement("div", "asset-empty-image");
+    const image = createMascotImage("thinking", "たぬきマスコット", "asset-empty-mascot");
+    if (image) imageWrap.appendChild(image);
+    card.append(copy, imageWrap);
+    empty.replaceChildren(card);
     bindMascotFallback(empty);
   }
 
@@ -1226,7 +1247,7 @@
     const el = $("assetCards");
     const summary = currentAssetSummary();
     if (!summary) {
-      el.innerHTML = "";
+      el.replaceChildren();
       return;
     }
     const totalChange = summary.month_change_yen;
@@ -1235,27 +1256,49 @@
     const isYear = state.asset.viewMode === "year";
     const periodCaption = isYear
       ? (summary.is_ytd ? `${summary.year}年（年初〜最新月）` : `${summary.year}年`)
-      : `評価日 ${escapeHtml(summary.valuation_date || "--")}`;
+      : `評価日 ${summary.valuation_date || "--"}`;
 
-    el.innerHTML = `
-      <article class="asset-card asset-card-total">
-        <h3>${isYear ? "年次サマリー（評価額）" : "総資産（評価額）"}</h3>
-        <div class="asset-card-main">${fmt.format(summary.current_value_yen || 0)}</div>
-  
-        <p class="asset-card-sub">
-          総資産差（買い増し込み） ${totalChange === null || totalChange === undefined ? '--' : formatSignedYen(totalChange)}
-          <span class="asset-card-sub-rate">前月比 ${totalChangeRate === null || totalChangeRate === undefined ? '--' : formatSignedPercent(totalChangeRate)}</span>
-        </p>
+    const card = makeElement("article", "asset-card asset-card-total");
+    card.appendChild(makeElement("h3", "", isYear ? "年次サマリー（評価額）" : "総資産（評価額）"));
+    card.appendChild(makeElement("div", "asset-card-main", fmt.format(summary.current_value_yen || 0)));
 
-        <p class="asset-card-note">${periodCaption}</p>
-        <div class="asset-card-breakdown">
-          <p><span>${isYear ? '年間買い増し額' : '買い増し額'}</span><strong>${fmt.format(summary.purchase_amount_yen || 0)}</strong></p>
-          <p><span>運用増減（買い増し除外）</span><strong class="${valueToneClass(operation)}">${operation === null || operation === undefined ? '--' : formatSignedYen(operation)}</strong></p>
-          <p><span>評価日</span><strong>${escapeHtml(summary.valuation_date || '--')}</strong></p>
-        </div>
-        <div class="asset-mascot-wrap">${mascotImageHtml("cheer", "たぬきマスコット")}</div>
-      </article>
-    `;
+    const sub = makeElement(
+      "p",
+      "asset-card-sub",
+      `総資産差（買い増し込み） ${totalChange == null ? "--" : formatSignedYen(totalChange)} `,
+    );
+    sub.appendChild(makeElement(
+      "span",
+      "asset-card-sub-rate",
+      `前月比 ${totalChangeRate == null ? "--" : formatSignedPercent(totalChangeRate)}`,
+    ));
+    card.appendChild(sub);
+    card.appendChild(makeElement("p", "asset-card-note", periodCaption));
+
+    const breakdown = makeElement("div", "asset-card-breakdown");
+    const breakdownRow = (label, value, strongClass = "") => {
+      const row = document.createElement("p");
+      row.appendChild(makeElement("span", "", label));
+      row.appendChild(makeElement("strong", strongClass, value));
+      return row;
+    };
+    breakdown.appendChild(breakdownRow(
+      isYear ? "年間買い増し額" : "買い増し額",
+      fmt.format(summary.purchase_amount_yen || 0),
+    ));
+    breakdown.appendChild(breakdownRow(
+      "運用増減（買い増し除外）",
+      operation == null ? "--" : formatSignedYen(operation),
+      valueToneClass(operation),
+    ));
+    breakdown.appendChild(breakdownRow("評価日", summary.valuation_date || "--"));
+    card.appendChild(breakdown);
+
+    const mascotWrap = makeElement("div", "asset-mascot-wrap");
+    const mascot = createMascotImage("cheer", "たぬきマスコット");
+    if (mascot) mascotWrap.appendChild(mascot);
+    card.appendChild(mascotWrap);
+    el.replaceChildren(card);
     bindMascotFallback(el);
   }
 
@@ -1478,15 +1521,20 @@
     const account = $("assetPurchaseAccountType");
     const products = state.asset.products || [];
     if (!products.length) {
-      select.innerHTML = '<option value="">商品がありません</option>';
+      const option = document.createElement("option");
+      option.value = "";
+      option.textContent = "商品がありません";
+      select.replaceChildren(option);
       account.value = "";
       return;
     }
-    select.innerHTML = products.map((row) => `
-      <option value="${row.id}" data-account="${escapeHtml(row.account_type || "")}">
-        ${escapeHtml(row.name)} (${escapeHtml(row.account_type || "未分類")})
-      </option>
-    `).join("");
+    select.replaceChildren(...products.map((row) => {
+      const option = document.createElement("option");
+      option.value = String(row.id);
+      option.dataset.account = row.account_type || "";
+      option.textContent = `${row.name} (${row.account_type || "未分類"})`;
+      return option;
+    }));
     const sync = () => {
       const selected = products.find((row) => String(row.id) === String(select.value));
       account.value = selected?.account_type || "";

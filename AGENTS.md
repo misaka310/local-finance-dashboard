@@ -2,6 +2,9 @@
 
 このリポジトリをCodexなどのエージェントで編集する場合の固定ルールです。
 
+- 仕様の正本: `docs/ARCHITECTURE.md`
+- 仕様変更時は実装前に正本を更新し、同じ変更に含める。
+
 ## 最優先
 
 - Gmail OAuthクライアントJSON、OAuthトークン、SQLite DB、実明細データをGit管理に入れない。
