@@ -104,12 +104,60 @@
     return String(categoryId || "") === FUND_MOVEMENT_CATEGORY_ID;
   }
 
+  function safeMascotDataUri(value) {
+    const text = String(value || "");
+    return /^data:image\/(?:png|webp);base64,[A-Za-z0-9+/=]+$/.test(text) ? text : "";
+  }
+
+  function createMascotImage(assetName, altText, className = "") {
+    const asset = (payload.mascots || {})[assetName];
+    if (!asset) {
+      return null;
+    }
+    const webp = safeMascotDataUri(asset.webp);
+    const png = safeMascotDataUri(asset.png);
+    if (!webp || !png) {
+      return null;
+    }
+    const img = document.createElement("img");
+    img.src = webp;
+    img.dataset.fallback = png;
+    img.alt = String(altText || "");
+    img.className = String(className || "");
+    img.loading = "lazy";
+    img.decoding = "async";
+    return img;
+  }
+
   function mascotImageHtml(assetName, altText, className = "") {
     const asset = (payload.mascots || {})[assetName];
     if (!asset) {
       return "";
     }
-    return `<img src="${asset.webp}" data-fallback="${asset.png}" alt="${escapeHtml(altText)}" class="${className}" loading="lazy" decoding="async" />`;
+    const webp = safeMascotDataUri(asset.webp);
+    const png = safeMascotDataUri(asset.png);
+    if (!webp || !png) {
+      return "";
+    }
+    return `<img src="${webp}" data-fallback="${png}" alt="${escapeHtml(altText)}" class="${escapeHtml(className)}" loading="lazy" decoding="async" />`;
+  }
+
+  function appendMascot(root, assetName, altText, className = "") {
+    const img = createMascotImage(assetName, altText, className);
+    if (img) {
+      root.appendChild(img);
+    }
+  }
+
+  function makeElement(tagName, className = "", text = null) {
+    const node = document.createElement(tagName);
+    if (className) {
+      node.className = className;
+    }
+    if (text !== null && text !== undefined) {
+      node.textContent = String(text);
+    }
+    return node;
   }
 
   function bindMascotFallback(root) {
@@ -708,7 +756,8 @@
     state.editing = tx;
     const mascot = $("editDialogMascot");
     if (mascot) {
-      mascot.innerHTML = mascotImageHtml("icon", "たぬきアイコン", "analysis-mascot analysis-mascot-dialog");
+      mascot.replaceChildren();
+      appendMascot(mascot, "icon", "たぬきアイコン", "analysis-mascot analysis-mascot-dialog");
       bindMascotFallback(mascot);
     }
     $("editMerchant").textContent = `${tx.merchant} / ${fmt.format(tx.amount_yen)}`;
@@ -1482,11 +1531,20 @@
       account.value = "";
       return;
     }
-    select.innerHTML = products.map((row) => `
+    const options = products.map((row) => {
+      const option = document.createElement("option");
+      option.value = String(row.id);
+      option.dataset.account = String(row.account_type || "");
+      option.textContent = `${String(row.name || "")} (${String(row.account_type || "未分類")})`;
+      return option;
+    });
+    select.replaceChildren(...options);
+    /*
       <option value="${row.id}" data-account="${escapeHtml(row.account_type || "")}">
         ${escapeHtml(row.name)} (${escapeHtml(row.account_type || "未分類")})
       </option>
     `).join("");
+    */
     const sync = () => {
       const selected = products.find((row) => String(row.id) === String(select.value));
       account.value = selected?.account_type || "";
