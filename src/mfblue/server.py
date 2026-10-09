@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import mimetypes
 import webbrowser
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -15,6 +14,15 @@ from .paths import project_path
 from .static_paths import resolve_static_path
 
 FRONTEND_DIR = project_path("frontend")
+STATIC_CONTENT_TYPES = {
+    ".html": "text/html; charset=utf-8",
+    ".css": "text/css; charset=utf-8",
+    ".js": "text/javascript; charset=utf-8",
+    ".json": "application/json; charset=utf-8",
+    ".png": "image/png",
+    ".webp": "image/webp",
+    ".svg": "image/svg+xml",
+}
 TRUSTED_LOOPBACK_HOSTS = {"127.0.0.1", "localhost"}
 
 
@@ -156,12 +164,9 @@ class Handler(BaseHTTPRequestHandler):
     def serve_static(self, path: str) -> None:
         file_path = resolve_static_path(path, FRONTEND_DIR)
         if file_path is None:
-            self.send_error(HTTPStatus.FORBIDDEN)
-            return
-        if not file_path.exists() or not file_path.is_file():
             self.send_error(HTTPStatus.NOT_FOUND)
             return
-        content_type = mimetypes.guess_type(str(file_path))[0] or "application/octet-stream"
+        content_type = STATIC_CONTENT_TYPES.get(file_path.suffix.lower(), "application/octet-stream")
         raw = file_path.read_bytes()
         self.send_response(200)
         self.send_header("Content-Type", content_type)
