@@ -104,14 +104,23 @@
     return String(categoryId || "") === FUND_MOVEMENT_CATEGORY_ID;
   }
 
-  function safeMascotDataUri(value, mimeType) {
+  function mascotObjectUrl(value, mimeType) {
     const prefix = `data:image/${mimeType};base64,`;
     const candidate = String(value || "");
     if (!candidate.startsWith(prefix)) {
       return "";
     }
     const payloadText = candidate.slice(prefix.length);
-    return /^[A-Za-z0-9+/]+={0,2}$/.test(payloadText) ? candidate : "";
+    if (!/^[A-Za-z0-9+/]+={0,2}$/.test(payloadText)) {
+      return "";
+    }
+    try {
+      const binary = atob(payloadText);
+      const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+      return URL.createObjectURL(new Blob([bytes], { type: `image/${mimeType}` }));
+    } catch (_error) {
+      return "";
+    }
   }
 
   function mascotImageElement(assetName, altText, className = "") {
@@ -119,8 +128,8 @@
     if (!asset) {
       return null;
     }
-    const webp = safeMascotDataUri(asset.webp, "webp");
-    const png = safeMascotDataUri(asset.png, "png");
+    const webp = mascotObjectUrl(asset.webp, "webp");
+    const png = mascotObjectUrl(asset.png, "png");
     if (!webp && !png) {
       return null;
     }
@@ -160,7 +169,7 @@
       }
       img.dataset.fallbackBound = "1";
       img.addEventListener("error", () => {
-        const fallback = safeMascotDataUri(img.dataset.fallback || "", "png");
+        const fallback = img.dataset.fallback || "";
         if (!fallback || img.dataset.fallbackTried === "1") {
           img.hidden = true;
           return;
