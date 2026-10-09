@@ -25,7 +25,16 @@ def build_static_file_map(frontend_dir: Path) -> dict[str, Path]:
 
 def resolve_static_path(request_path: str, frontend_dir: Path) -> Path | None:
     """Resolve a request only to a trusted, pre-indexed frontend file."""
-    path = str(request_path or "").split("?", 1)[0].split("#", 1)[0]
-    if not path.startswith("/") and path:
-        path = f"/{path}"
-    return build_static_file_map(frontend_dir).get(path)
+    path = str(request_path or "").split("?", 1)[0].split("#", 1)[0].replace("\", "/")
+    parts: list[str] = []
+    for part in path.split("/"):
+        if part in {"", "."}:
+            continue
+        if part == "..":
+            if not parts:
+                return None
+            parts.pop()
+            continue
+        parts.append(part)
+    normalized = "/" + "/".join(parts) if parts else "/"
+    return build_static_file_map(frontend_dir).get(normalized)
