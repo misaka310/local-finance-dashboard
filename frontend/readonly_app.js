@@ -104,12 +104,14 @@
     return String(categoryId || "") === FUND_MOVEMENT_CATEGORY_ID;
   }
 
-  function mascotImageHtml(assetName, altText, className = "") {
-    const asset = (payload.mascots || {})[assetName];
-    if (!asset) {
+  function safeMascotDataUri(value, mimeType) {
+    const prefix = `data:image/${mimeType};base64,`;
+    const candidate = String(value || "");
+    if (!candidate.startsWith(prefix)) {
       return "";
     }
-    return `<img src="${asset.webp}" data-fallback="${asset.png}" alt="${escapeHtml(altText)}" class="${className}" loading="lazy" decoding="async" />`;
+    const payloadText = candidate.slice(prefix.length);
+    return /^[A-Za-z0-9+/]+={0,2}$/.test(payloadText) ? candidate : "";
   }
 
   function mascotImageElement(assetName, altText, className = "") {
@@ -117,9 +119,16 @@
     if (!asset) {
       return null;
     }
+    const webp = safeMascotDataUri(asset.webp, "webp");
+    const png = safeMascotDataUri(asset.png, "png");
+    if (!webp && !png) {
+      return null;
+    }
     const img = document.createElement("img");
-    img.src = String(asset.webp || "");
-    img.dataset.fallback = String(asset.png || "");
+    img.src = webp || png;
+    if (png && png !== img.src) {
+      img.dataset.fallback = png;
+    }
     img.alt = String(altText || "");
     img.className = String(className || "");
     img.loading = "lazy";
@@ -151,7 +160,7 @@
       }
       img.dataset.fallbackBound = "1";
       img.addEventListener("error", () => {
-        const fallback = img.dataset.fallback || "";
+        const fallback = safeMascotDataUri(img.dataset.fallback || "", "png");
         if (!fallback || img.dataset.fallbackTried === "1") {
           img.hidden = true;
           return;
