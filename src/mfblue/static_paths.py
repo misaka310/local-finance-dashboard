@@ -3,21 +3,29 @@ from __future__ import annotations
 from pathlib import Path
 
 
-def resolve_static_path(request_path: str, frontend_dir: Path) -> Path | None:
-    """Resolve a frontend asset while enforcing path-component containment.
+def build_static_file_map(frontend_dir: Path) -> dict[str, Path]:
+    """Index real frontend files so request data is used only as a dictionary key.
 
-    String-prefix checks are insufficient because a sibling such as
-    ``frontend_backup`` starts with ``frontend``. Resolving both paths and using
-    ``relative_to`` makes the directory boundary explicit on Windows and POSIX.
-    The caller remains responsible for checking that the returned path exists.
+    The returned paths originate exclusively from the trusted frontend directory;
+    no request-controlled string is ever joined into a filesystem path.
     """
     root = frontend_dir.resolve()
-    clean = "index.html" if request_path in ("", "/") else request_path.lstrip("/")
-    candidate = (root / clean).resolve()
+    files: dict[str, Path] = {}
+    for candidate in root.rglob("*"):
+        if not candidate.is_file():
+            continue
+        relative = candidate.relative_to(root).as_posix()
+        files[f"/{relative}"] = candidate
+    index = files.get("/index.html")
+    if index is not None:
+        files["/"] = index
+        files[""] = index
+    return files
 
-    try:
-        candidate.relative_to(root)
-    except ValueError:
-        return None
 
-    return candidate
+def resolve_static_path(request_path: str, frontend_dir: Path) -> Path | None:
+    """Resolve a request only to a trusted, pre-indexed frontend file."""
+    path = str(request_path or "").split("?", 1)[0].split("#", 1)[0]
+    if not path.startswith("/") and path:
+        path = f"/{path}"
+    return build_static_file_map(frontend_dir).get(path)
