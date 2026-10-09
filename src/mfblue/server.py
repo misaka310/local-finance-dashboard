@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import mimetypes
 import webbrowser
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -12,7 +11,7 @@ from .api_routes import handle_get, handle_patch, handle_post
 from .config import load_config
 from .db import db, init_db
 from .paths import project_path
-from .static_paths import resolve_static_path
+from .static_paths import resolve_static_asset
 
 FRONTEND_DIR = project_path("frontend")
 TRUSTED_LOOPBACK_HOSTS = {"127.0.0.1", "localhost"}
@@ -154,17 +153,13 @@ class Handler(BaseHTTPRequestHandler):
         handle_patch(self)
 
     def serve_static(self, path: str) -> None:
-        file_path = resolve_static_path(path, FRONTEND_DIR)
-        if file_path is None:
-            self.send_error(HTTPStatus.FORBIDDEN)
-            return
-        if not file_path.exists() or not file_path.is_file():
+        asset = resolve_static_asset(path, FRONTEND_DIR)
+        if asset is None:
             self.send_error(HTTPStatus.NOT_FOUND)
             return
-        content_type = mimetypes.guess_type(str(file_path))[0] or "application/octet-stream"
-        raw = file_path.read_bytes()
+        raw = asset.path.read_bytes()
         self.send_response(200)
-        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Type", asset.content_type)
         self.send_header("Content-Length", str(len(raw)))
         self.end_headers()
         self.wfile.write(raw)
