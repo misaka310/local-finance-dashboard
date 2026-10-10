@@ -64,3 +64,9 @@ UIでカテゴリを手動変更した場合、同じ店名を次回から同じ
 - 表示幅はスマホアプリ風
 - 青系アクセント
 - 月別支出、円グラフ、カテゴリ一覧、明細一覧、カテゴリ修正を実装
+## 公開リポジトリのFuzzing
+
+- メール・注文パーサなど外部入力を受ける境界は ClusterFuzzLite + Atheris でPRごとにfuzzする。
+- fuzz target は実データや認証情報を使わず、任意bytesからのパースで予期外のcrashがないことを確認する。
+- ClusterFuzzLite GitHub Actions はcommit SHA固定とし、PRで最低60秒実行する。
+
