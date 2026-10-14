@@ -7,10 +7,16 @@ from typing import Any
 from .paths import project_path
 
 DEFAULT_CONFIG_PATH = project_path("config", "fund_price_sources.json")
+LOCAL_CONFIG_PATH = project_path("config", "local_fund_price_sources.json")
 
 
 def load_fund_price_sources(config_path: Path | None = None) -> list[dict[str, Any]]:
-    path = config_path or DEFAULT_CONFIG_PATH
+    if config_path is not None:
+        path = config_path
+    elif LOCAL_CONFIG_PATH.exists():
+        path = LOCAL_CONFIG_PATH
+    else:
+        path = DEFAULT_CONFIG_PATH
     if not path.exists():
         return []
     payload = json.loads(path.read_text(encoding="utf-8"))
@@ -22,4 +28,3 @@ def load_fund_price_sources(config_path: Path | None = None) -> list[dict[str, A
             continue
         result.append(dict(item))
     return result
-

@@ -29,32 +29,21 @@
   - `受渡金額` → `amount_yen`
 - 保存先テーブル: `asset_trades`
 
-## 基準価額取得元（公式API優先）
-- 三菱UFJアセットマネジメント系ファンドは、公式Web API仕様書を一次情報として利用する。
-  - 仕様書: https://www.am.mufg.jp/assets/pdf/tool/webapi/fund_api.pdf
-  - API Host: `https://developer.am.mufg.jp`
-  - 主要エンドポイント:
-    - `GET /fund_information_latest/fund_cd/{fund_cd}`
-    - `GET /fund_information_date/fund_cd/{fund_cd}/base_date/{yyyymmdd}`
-  - `source_type` は `official_api` を使用。
-  - APIで取得失敗時のみ `chart_data_*.js`（`official_public_data`）へフォールバックする。
+## 基準価額取得元
 
-- ｅＭＡＸＩＳ　Ｓｌｉｍ　米国株式（Ｓ＆Ｐ５００）  
-  - 三菱ＵＦＪアセットマネジメント  
-  - 公式API（fund_cd）: `253266` / 協会コード: `03311187`
-  - API URL: `https://developer.am.mufg.jp/fund_information_date/fund_cd/253266/base_date/{base_date}`
-  - フォールバック: `https://www.am.mufg.jp/fund_file/chart/chart_data_253266.js`
-- ｅＭＡＸＩＳ　Ｓｌｉｍ　新興国株式インデックス  
-  - 三菱ＵＦＪアセットマネジメント  
-  - 公式API（fund_cd）: `252878` / 協会コード: `0331C177`
-  - API URL: `https://developer.am.mufg.jp/fund_information_date/fund_cd/252878/base_date/{base_date}`
-  - フォールバック: `https://www.am.mufg.jp/fund_file/chart/chart_data_252878.js`
-- ニッセイＳＯＸ指数インデックスファンド（米国半導体株）＜購入・換金手数料なし＞  
-  - ニッセイアセットマネジメント  
-  - `https://www.nam.co.jp/fundinfo/data/csv.php?fund_code=122309`
-- ＳＢＩ日本高配当株式（分配）ファンド（年４回決算型）  
-  - SBIアセットマネジメント（公開ページからリンクされる公開データ）  
-  - `https://apl.wealthadvisor.jp/xml/chart/funddata/2023121201.xml`
+個人の保有銘柄や実運用中の取得元は公開リポジトリへコミットしません。公開版の `config/fund_price_sources.json` は空の安全な既定値です。
+
+実運用では `config/local_fund_price_sources.json` を作成し、各銘柄について次の項目を設定してください。このファイル名は `.gitignore` 対象で、公開リポジトリには含まれません。
+
+- `fund_name`
+- `provider_name`
+- `source_url`
+- `source_type`
+- `parser_name`
+- 必要に応じて `fund_cd` / `association_fund_cd`
+- `is_active`
+
+対応パーサーは公式API・公式CSV・公式公開データを対象とし、取得元は各運用会社の一次情報を優先してください。
 
 ## 月次スナップショット生成仕様
 - 計算式: `評価額 = 保有口数 × 基準価額 ÷ 10000`
