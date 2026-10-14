@@ -26,7 +26,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
     },
     "analysis": {
         "enabled": False,
-        "codex_app_server_url": "ws://127.0.0.1:8787",
+        "codex_app_server_url": "",
         "analyzer": "codex-app-server",
         "analyzer_version": "v2",
         "timeout_seconds": 120,
