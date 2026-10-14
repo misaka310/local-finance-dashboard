@@ -6,6 +6,9 @@ from typing import Any
 
 from .paths import project_path
 
+PUBLIC_CONFIG_PATH = project_path("config", "app.json")
+LOCAL_CONFIG_PATH = project_path("config", "local.json")
+
 DEFAULT_CONFIG: dict[str, Any] = {
     "app": {
         "name": "local-finance-dashboard",
@@ -13,18 +16,16 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "database_path": "data/mfblue.sqlite3",
     },
     "gmail": {
-        "query": 'newer_than:180d (from:(paypay-card.co.jp) OR subject:(PayPayカード) OR "PayPayカード")',
         "max_results": 100,
-        "source_id": "paypay-card",
-        "account_name": "PayPayカード",
         "timezone": "Asia/Tokyo",
+        "sources": [],
     },
     "privacy": {
         "store_email_body": False,
         "store_raw_snippet": False,
     },
     "analysis": {
-        "enabled": True,
+        "enabled": False,
         "codex_app_server_url": "ws://127.0.0.1:8787",
         "analyzer": "codex-app-server",
         "analyzer_version": "v2",
@@ -43,12 +44,20 @@ def _deep_merge(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any
     return result
 
 
-def load_config() -> dict[str, Any]:
-    path = project_path("config", "app.json")
+def _load_json_object(path: Path) -> dict[str, Any]:
     if not path.exists():
-        return DEFAULT_CONFIG
+        return {}
     data = json.loads(path.read_text(encoding="utf-8"))
-    return _deep_merge(DEFAULT_CONFIG, data)
+    if not isinstance(data, dict):
+        raise ValueError(f"config must be object: {path}")
+    return data
+
+
+def load_config() -> dict[str, Any]:
+    result = _deep_merge(DEFAULT_CONFIG, _load_json_object(PUBLIC_CONFIG_PATH))
+    # Machine/user-specific values belong in this ignored file so they never
+    # need to be committed to the public repository.
+    return _deep_merge(result, _load_json_object(LOCAL_CONFIG_PATH))
 
 
 def database_path() -> Path:
