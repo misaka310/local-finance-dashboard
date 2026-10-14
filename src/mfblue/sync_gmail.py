@@ -23,7 +23,7 @@ PARSERS: dict[str, ParserFunc] = {
 def _gmail_sources(cfg: dict[str, Any]) -> list[dict[str, Any]]:
     gmail_cfg = cfg["gmail"]
     sources = gmail_cfg.get("sources")
-    if isinstance(sources, list) and sources:
+    if isinstance(sources, list):
         result: list[dict[str, Any]] = []
         for source in sources:
             if not isinstance(source, dict):
