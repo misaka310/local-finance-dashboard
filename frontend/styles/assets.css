@@ -1,0 +1,508 @@
+.asset-view {
+  padding-bottom: 12px;
+}
+
+.asset-period-row {
+  padding-top: 14px;
+}
+
+.asset-empty {
+  padding: 6px 16px 2px;
+}
+
+.asset-empty-card {
+  display: grid;
+  grid-template-columns: 1fr 80px;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #d7e7fb;
+  background: linear-gradient(140deg, #f7fbff 0%, #eef5ff 100%);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.asset-empty-title {
+  margin: 0;
+  color: #134782;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.asset-empty-text {
+  margin: 6px 0 0;
+  color: #516d90;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.asset-empty-image {
+  width: 80px;
+  height: 80px;
+}
+
+.asset-empty-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.asset-cards {
+  padding: 4px 16px 8px;
+}
+
+.asset-mode-row {
+  padding: 6px 16px 2px;
+}
+
+.asset-card {
+  position: relative;
+  width: 100%;
+  border-radius: 18px;
+  padding: 14px 14px 14px;
+  color: #f8fbff;
+  background:
+    radial-gradient(circle at 85% 26%, rgba(120, 196, 255, 0.24), transparent 46%),
+    linear-gradient(130deg, #0b53ba 0%, #1564c6 46%, #1443a9 100%);
+  box-shadow: 0 16px 32px rgba(16, 76, 146, 0.28);
+  overflow: hidden;
+}
+
+.asset-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 70px;
+  background: linear-gradient(0deg, rgba(126, 204, 255, 0.28), rgba(126, 204, 255, 0));
+  z-index: 0;
+}
+
+.asset-card h3 {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  opacity: 0.95;
+}
+
+.asset-card-main {
+  position: relative;
+  z-index: 2;
+  margin-top: 10px;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.asset-card-sub {
+  position: relative;
+  z-index: 2;
+  margin-top: 6px;
+  font-size: 13px;
+  opacity: 0.94;
+}
+
+.asset-card-note {
+  position: relative;
+  z-index: 2;
+  margin-top: 8px;
+  font-size: 12px;
+  opacity: 0.88;
+}
+
+.asset-card-sub-rate {
+  margin-left: 6px;
+  opacity: 0.9;
+}
+
+.asset-card-breakdown {
+  position: relative;
+  z-index: 2;
+  margin-top: 10px;
+  padding: 8px 9px;
+  border-radius: 10px;
+  background: rgba(6, 25, 57, 0.38);
+  backdrop-filter: blur(2px);
+  display: flex;
+  flex-direction: column;
+  width: 65%; /* Avoid mascot on the right */
+  gap: 6px 10px;
+}
+
+.asset-card-breakdown p {
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.asset-card-breakdown span {
+  opacity: 0.86;
+}
+
+.asset-card-breakdown strong {
+  font-size: 12px;
+  color: #f6fbff;
+}
+
+.asset-card-breakdown strong.positive {
+  color: #e3f5ff !important;
+}
+
+.asset-card-breakdown strong.negative {
+  color: #ffd9dd !important;
+}
+
+.asset-card-breakdown strong.neutral {
+  color: #f6fbff !important;
+}
+
+.asset-card-total .asset-mascot-wrap {
+  position: absolute;
+  right: 12px;
+  bottom: 8px;
+  width: 80px;
+  height: 80px;
+  opacity: 0.95;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.asset-card-total .asset-mascot-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: right bottom;
+  filter: drop-shadow(0 10px 18px rgba(6, 24, 48, 0.24));
+}
+
+.asset-card-total {
+  min-height: 200px;
+}
+
+.asset-card-total h3,
+.asset-card-total .asset-card-main,
+.asset-card-total .asset-card-sub,
+.asset-card-total .asset-card-note,
+.asset-card-total .asset-card-breakdown {
+  max-width: calc(100% - 92px);
+}
+
+.asset-total-mascot {
+  opacity: 0.96;
+}
+
+.asset-chart-section,
+.asset-summary-section,
+.asset-yearly-section,
+.asset-holdings-section {
+  margin-top: 4px;
+}
+
+.asset-section-header {
+  padding-top: 10px;
+}
+
+.asset-metric-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 0 16px 10px;
+}
+
+.asset-metric-tab {
+  border: 1px solid #cbdbef;
+  border-radius: 999px;
+  background: #fff;
+  color: #385271;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 6px 12px;
+  white-space: nowrap;
+}
+
+.asset-metric-tab.active {
+  border-color: transparent;
+  background: #0f5fbc;
+  color: #fff;
+}
+
+.asset-chart {
+  margin: 0 16px;
+  border: 1px solid #d8e6f7;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fbfdff 0%, #f3f8ff 100%);
+  padding: 10px 10px 12px;
+}
+
+.asset-chart-compare {
+  display: flex;
+  flex-direction: column;
+  width: 65%; /* Avoid mascot on the right */
+  gap: 4px 8px;
+  margin: 0 0 8px;
+  color: #26476f;
+  font-size: 12px;
+}
+
+.asset-refresh-status {
+  margin: 0 16px 8px;
+  font-size: 12px;
+}
+
+.asset-chart-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+
+.asset-chart-metric {
+  margin: 0;
+  color: #17467c;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.asset-chart-latest {
+  margin: 0;
+  color: #0f5fbc;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.asset-line-chart {
+  width: 100%;
+  height: auto;
+}
+
+.asset-chart-y-guide {
+  stroke: #d8e5f4;
+  stroke-width: 1;
+}
+
+.asset-chart-y-label {
+  fill: #6280a5;
+  font-size: 10px;
+}
+
+.asset-chart-plot-bg {
+  fill: rgba(230, 240, 255, 0.48);
+}
+
+.asset-chart-zero-line {
+  stroke: #b5c9e6;
+  stroke-dasharray: 4 4;
+  stroke-width: 1.2;
+}
+
+.asset-chart-area {
+  fill: rgba(21, 101, 192, 0.14);
+}
+
+.asset-chart-line {
+  fill: none;
+  stroke: #1d68c3;
+  stroke-width: 2.4;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.asset-chart-point {
+  fill: #fff;
+  stroke: #1d68c3;
+  stroke-width: 2;
+  cursor: pointer;
+}
+
+.asset-chart-point.active {
+  fill: #1d68c3;
+  stroke: #fff;
+  stroke-width: 1.8;
+}
+
+.asset-chart-x-label {
+  fill: #5f7898;
+  font-size: 11px;
+}
+
+.asset-chart-tooltip rect {
+  fill: #1d68c3;
+}
+
+.asset-chart-tooltip text {
+  fill: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.asset-summary-list {
+  margin: 0 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: auto;
+  gap: 10px;
+}
+
+.asset-summary-item {
+  border: 1px solid #dce8f8;
+  border-radius: 14px;
+  background: #fff;
+  padding: 10px 12px;
+  min-height: 72px;
+}
+
+.asset-summary-item.primary {
+  border-color: #b8d4f5;
+  box-shadow: 0 8px 18px rgba(21, 88, 167, 0.08);
+}
+
+.asset-summary-list dt {
+  color: #546a85;
+  font-size: 12px;
+}
+
+.asset-summary-list dd {
+  margin: 6px 0 0;
+  font-weight: 800;
+  color: #223f61;
+  font-size: 23px;
+}
+
+.asset-yearly-cards {
+  padding: 0 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.asset-year-card {
+  border: 1px solid #d7e6f8;
+  background: #fff;
+  border-radius: 14px;
+  padding: 11px 12px;
+}
+
+.asset-year-card h3 {
+  margin: 0 0 8px;
+  color: #1e456f;
+  font-size: 15px;
+}
+
+.asset-year-card p {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #314f72;
+}
+
+.asset-year-note {
+  color: #6f5a27 !important;
+  background: #fff6de;
+  border: 1px solid #f4df9f;
+  border-radius: 8px;
+  padding: 4px 8px;
+}
+
+.asset-holdings {
+  padding: 0 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.asset-holding-card {
+  border: 1px solid #d9e5f5;
+  border-radius: 14px;
+  background: #fff;
+  padding: 12px;
+}
+
+.asset-holding-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.asset-holding-title {
+  margin: 0;
+  font-size: 14px;
+  color: #1b3e67;
+}
+
+.asset-holding-value {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: #123b68;
+  line-height: 1.1;
+  text-align: right;
+}
+
+.asset-holding-meta {
+  margin-top: 6px;
+  color: #5f7694;
+  font-size: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+}
+
+.asset-source-chip {
+  border: 1px solid #d3e3f7;
+  border-radius: 999px;
+  padding: 1px 8px;
+  background: #f7fbff;
+}
+
+.asset-holding-pnl {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 8px;
+}
+
+.asset-holding-pnl p {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #2d4f74;
+}
+
+.asset-holding-grid {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 12px;
+}
+
+.asset-holding-grid p {
+  margin: 0;
+  font-size: 12px;
+  color: #3d5878;
+}
+
+.asset-holding-grid strong {
+  color: #1e3c60;
+}
+
+.positive {
+  color: #1d5fae !important;
+}
+
+.negative {
+  color: #b04a4a !important;
+}
+
+.neutral {
+  color: #365171 !important;
+}
+
+.asset-purchase-section {
+  padding: 14px 16px 10px;
+}
+
+.asset-purchase-button {
+  width: 100%;
+}

@@ -1,0 +1,121 @@
+{
+  "recommended_repo_path": "frontend/assets/mascot/tanuki/",
+  "assets": {
+    "tanuki_main_full": {
+      "png": "png/tanuki_main_full.png",
+      "webp": "webp/tanuki_main_full.webp",
+      "size": [
+        794,
+        846
+      ]
+    },
+    "tanuki_thinking": {
+      "png": "png/tanuki_thinking.png",
+      "webp": "webp/tanuki_thinking.webp",
+      "size": [
+        246,
+        328
+      ]
+    },
+    "tanuki_happy_pouch": {
+      "png": "png/tanuki_happy_pouch.png",
+      "webp": "webp/tanuki_happy_pouch.webp",
+      "size": [
+        277,
+        279
+      ]
+    },
+    "tanuki_mail_wink": {
+      "png": "png/tanuki_mail_wink.png",
+      "webp": "webp/tanuki_mail_wink.webp",
+      "size": [
+        277,
+        277
+      ]
+    },
+    "tanuki_cheer": {
+      "png": "png/tanuki_cheer.png",
+      "webp": "webp/tanuki_cheer.webp",
+      "size": [
+        266,
+        268
+      ]
+    },
+    "prop_pouch": {
+      "png": "png/prop_pouch.png",
+      "webp": "webp/prop_pouch.webp",
+      "size": [
+        144,
+        153
+      ]
+    },
+    "prop_receipt": {
+      "png": "png/prop_receipt.png",
+      "webp": "webp/prop_receipt.webp",
+      "size": [
+        163,
+        162
+      ]
+    },
+    "prop_calculator": {
+      "png": "png/prop_calculator.png",
+      "webp": "webp/prop_calculator.webp",
+      "size": [
+        112,
+        156
+      ]
+    },
+    "prop_envelope": {
+      "png": "png/prop_envelope.png",
+      "webp": "webp/prop_envelope.webp",
+      "size": [
+        139,
+        122
+      ]
+    },
+    "prop_coins": {
+      "png": "png/prop_coins.png",
+      "webp": "webp/prop_coins.webp",
+      "size": [
+        154,
+        125
+      ]
+    },
+    "tanuki_icon_128": {
+      "png": "png/tanuki_icon_128.png",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "tanuki_icon_256": {
+      "png": "png/tanuki_icon_256.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "tanuki_icon_512": {
+      "png": "png/tanuki_icon_512.png",
+      "size": [
+        512,
+        512
+      ]
+    }
+  },
+  "placements": {
+    "analysis_header": [
+      "tanuki_cheer.png",
+      "tanuki_thinking.png"
+    ],
+    "empty_analysis_state": [
+      "tanuki_thinking.png"
+    ],
+    "stale_analysis_notice": [
+      "tanuki_mail_wink.png"
+    ],
+    "category_dialog_small_icon": [
+      "tanuki_icon_128.png"
+    ]
+  }
+}
