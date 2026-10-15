@@ -1,0 +1,22 @@
+{
+  "result": {
+    "status": 200,
+    "retcount": 1,
+    "errcd": null,
+    "errmsg": null,
+    "function": "外部公開用ファンド情報（指定ファンド・基準日指定）"
+  },
+  "errors": {
+    "count": 0,
+    "error_list": []
+  },
+  "datasets": [
+    {
+      "fund_cd": "253266",
+      "association_fund_cd": "03311187",
+      "base_date": "20260516",
+      "fund_name": "ｅＭＡＸＩＳ Ｓｌｉｍ 米国株式（Ｓ＆Ｐ５００）",
+      "nav": 43125
+    }
+  ]
+}

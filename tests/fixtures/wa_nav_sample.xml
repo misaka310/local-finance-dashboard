@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="Shift_JIS"?>
+<morningstarXML>
+  <fund code="2023121201" name="sample">
+    <year value="2024">
+      <month value="07">
+        <day value="30" year="2024" month="07" price="11000" />
+        <day value="31" year="2024" month="07" price="11111" />
+      </month>
+      <month value="08">
+        <day value="30" year="2024" month="08" price="11222" />
+      </month>
+    </year>
+  </fund>
+</morningstarXML>
