@@ -78,6 +78,29 @@ def _origin_is_trusted(origin: str | None, expected_port: int) -> bool:
     )
 
 
+def _referer_is_trusted(referer: str | None, expected_port: int) -> bool:
+    # A Referer is the full URL of the page that issued the request, so --
+    # unlike an Origin -- any path/query on the loopback UI origin is fine.
+    # Only the scheme, host and port decide whether it is the dashboard
+    # itself or some other (possibly cross-origin) page.
+    value = str(referer or "").strip()
+    if not value:
+        return True
+    try:
+        parsed = urlsplit(value)
+        port = parsed.port if parsed.port is not None else 80
+    except ValueError:
+        return False
+    return (
+        parsed.scheme == "http"
+        and _normalized_hostname(parsed.hostname) in TRUSTED_LOOPBACK_HOSTS
+        and port == expected_port
+        and parsed.username is None
+        and parsed.password is None
+        and not parsed.fragment
+    )
+
+
 class Handler(BaseHTTPRequestHandler):
     server_version = "local-finance-dashboard/0.1"
 
@@ -128,6 +151,20 @@ class Handler(BaseHTTPRequestHandler):
         return True
 
     def _reject_untrusted_mutation(self) -> bool:
+        # Defense in depth for state-changing (POST/PATCH) routes, checked
+        # before any route handler -- and therefore any side effect -- runs:
+        #   * Host must be the loopback authority this server is bound to
+        #     (also applied to GET; guards DNS-rebinding style abuse).
+        #   * Content-Type must be application/json, so a CORS-safelisted
+        #     cross-origin POST (e.g. text/plain or a form encoding) can
+        #     never reach a handler.
+        #   * Origin / Referer, when present, must be the loopback UI
+        #     origin on this server's port. Browsers always send Origin on
+        #     mutations, but some shapes only carry a Referer, so both are
+        #     checked. When both are absent the caller is a non-browser
+        #     local client (curl, scripts, tests); that stays allowed --
+        #     it is not a browser CSRF shape and Host + Content-Type above
+        #     still apply.
         if self._reject_untrusted_host():
             return True
         if self.headers.get_content_type().lower() != "application/json":
@@ -142,6 +179,13 @@ class Handler(BaseHTTPRequestHandler):
                 "Untrusted Origin header",
                 status=HTTPStatus.FORBIDDEN,
                 error_code="untrusted_origin",
+            )
+            return True
+        if not _referer_is_trusted(self.headers.get("Referer"), self._server_port()):
+            self.send_error_json(
+                "Untrusted Referer header",
+                status=HTTPStatus.FORBIDDEN,
+                error_code="untrusted_referer",
             )
             return True
         return False
